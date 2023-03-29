@@ -65,6 +65,8 @@ public class WebSecurityConfig {
                 .hasAuthority("admin")
                 .antMatchers(HttpMethod.GET ,"/api/v1/balance/summary/user")
                 .hasAuthority("admin")
+                .antMatchers("/api/v1/service/**")
+                .hasAuthority("admin")
                 .anyRequest()
                 .authenticated()
 

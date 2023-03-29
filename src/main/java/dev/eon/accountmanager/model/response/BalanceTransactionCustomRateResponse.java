@@ -55,7 +55,6 @@ public class BalanceTransactionCustomRateResponse {
         } else {
             this.customDebitRate = 1F;
         }
-
         this.customDebit = this.debit * this.customDebitRate;
 
         if (balanceTransaction.getCreditCurrency().equalsIgnoreCase("IDR")) {

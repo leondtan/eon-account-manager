@@ -23,3 +23,8 @@ spring:
       max-request-size: 215MB
 app:
   base-path: /api/v1
+
+rabbitmq:
+  host: localhost
+  username: user
+  password: dummmy123

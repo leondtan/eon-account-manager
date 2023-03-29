@@ -1,0 +1,25 @@
+spring:
+  main:
+    banner-mode: off
+  # #--DATABASE
+  datasource:
+    url: jdbc:postgresql://localhost:5432/account_db
+    username: postgres
+    password: tanaka1994
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgresPlusDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: false
+  servlet:
+    # #--MULTIPART
+    multipart:
+      file-size-threshold: 2KB
+      max-file-size: 200MB
+      max-request-size: 215MB
+app:
+  base-path: /api/v1

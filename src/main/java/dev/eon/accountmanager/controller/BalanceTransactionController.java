@@ -6,6 +6,8 @@ import dev.eon.accountmanager.model.repository.BalanceTransactionSpecificSummary
 import dev.eon.accountmanager.model.repository.BalanceTransactionSummary;
 import dev.eon.accountmanager.model.repository.BalanceTransactionUserSummary;
 import dev.eon.accountmanager.model.request.CreateBalanceTransactionRequest;
+import dev.eon.accountmanager.model.request.CustomRateRequest;
+import dev.eon.accountmanager.model.response.BalanceTransactionCustomRateResponse;
 import dev.eon.accountmanager.model.response.SuccessResponse;
 import dev.eon.accountmanager.service.BalanceTransactionService;
 import dev.eon.accountmanager.service.UserService;
@@ -15,6 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("${app.base-path}/balance")
@@ -65,12 +68,37 @@ public class BalanceTransactionController {
         ));
     }
 
+    @GetMapping("custom")
+    public ResponseEntity<?> getCustomByUser(@RequestParam(required = false) String type, @RequestBody() CustomRateRequest rates) {
+        String currentEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        User currentUser = _userService.getByEmail(currentEmail);
+
+        List<BalanceTransaction> tempResult = _service.getByUser(currentUser, null);
+
+        List<BalanceTransactionCustomRateResponse> result = tempResult.stream()
+                .map((item) -> new BalanceTransactionCustomRateResponse(item, rates))
+                .collect(Collectors.toList());
+
+        if (type.equals("loss")) {
+            result = result.stream().filter((item) -> item.getCustomCredit() > item.getCustomDebit())
+                    .collect(Collectors.toList());
+        } else if (type.equals("profit")) {
+            result = result.stream().filter((item) -> item.getCustomCredit() < item.getCustomDebit())
+                    .collect(Collectors.toList());
+        }
+
+        return ResponseEntity.ok(new SuccessResponse(
+                result,
+                HttpStatus.OK
+        ));
+    }
+
     @GetMapping("summary")
     public ResponseEntity<?> getSummaryByUser(@RequestParam(required = false) String type) {
         String currentEmail = SecurityContextHolder.getContext().getAuthentication().getName();
         User currentUser = _userService.getByEmail(currentEmail);
 
-        if(type == null || type.isEmpty()) {
+        if (type == null || type.isEmpty()) {
             List<BalanceTransactionSummary> result = _service.getSummaryByUser(currentUser);
 
             return ResponseEntity.ok(new SuccessResponse(
